@@ -43,8 +43,6 @@ public class ActServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-		System.out.println("main");
-        System.out.println("f");
 
     }
 
