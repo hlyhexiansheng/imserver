@@ -1,5 +1,7 @@
 package com.eaglive.actserver.handler;
 
+import com.eaglive.actserver.EventWorkPoolFacade;
+import com.eaglive.actserver.task.WorkTask;
 import com.eaglive.actserver.config.Command;
 import com.eaglive.actserver.config.ConfigData;
 import com.eaglive.actserver.domain.User;
@@ -7,6 +9,7 @@ import com.eaglive.actserver.manager.ChannelManager;
 import com.eaglive.actserver.manager.UserManager;
 import com.google.gson.JsonObject;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -16,6 +19,8 @@ import java.util.Map;
 /**
  * Created by admin on 2015/11/9.
  */
+
+@ChannelHandler.Sharable
 public class SystemHandler extends ChannelInboundHandlerAdapter {
     private final Map<String, Class> cmd2Handlers;
     public SystemHandler() {
@@ -49,16 +54,23 @@ public class SystemHandler extends ChannelInboundHandlerAdapter {
                 break;
             }
 
-            BaseHandler handler = getHandler(cmd, request, channel);
-            if (handler != null) {
-                handler.execute();
-            }
+            addToWorkThreadPool(cmd,request,channel);
 
         } while (false);
     }
 
+    private void addToWorkThreadPool(String cmd,JsonObject request,Channel channel){
+        WorkTask workTask = this.wrapIntoTask(this.getHandler(cmd, request, channel));
+        EventWorkPoolFacade.instance.addWork(workTask);
+    }
+
     private boolean checkCmd(String cmd) {
         return this.cmd2Handlers.containsKey(cmd);
+    }
+
+    private WorkTask wrapIntoTask(BaseHandler handler){
+        WorkTask workTask = new WorkTask(handler);
+        return workTask;
     }
 
     private BaseHandler getHandler(String cmd, JsonObject request, Channel channel) {
