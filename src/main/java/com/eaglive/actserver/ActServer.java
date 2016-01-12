@@ -30,6 +30,7 @@ public class ActServer {
     private Timer timer;
     public void init() {
         ConfigReader configReader = new ConfigReader();
+        System.out.println(this.getClass().getClassLoader().getResource("server-config.xml"));
         configReader.loadConfig(this.getClass().getClassLoader().getResource("server-config.xml").getPath());
         this.jedisPool = new JedisPool(ConfigData.redisHost, ConfigData.redisPort);
         this.baseExcutorService = Executors.newCachedThreadPool();
