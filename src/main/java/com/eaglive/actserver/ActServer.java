@@ -43,7 +43,6 @@ public class ActServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void startMonitor() {
