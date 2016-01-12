@@ -6,6 +6,7 @@
 *.swp
 *.out
 target/
+out/
 *.iml
 *.ipr
 *.iws
