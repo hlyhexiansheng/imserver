@@ -10,6 +10,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -23,6 +25,8 @@ import java.util.concurrent.Executors;
  */
 public class ActServer {
 
+    private static Logger logger = LoggerFactory.getLogger(ActServer.class);
+
     public static final ActServer server = new ActServer();
     private JedisPool jedisPool;
     private ExecutorService baseExcutorService;
@@ -30,7 +34,6 @@ public class ActServer {
     private Timer timer;
     public void init() {
         ConfigReader configReader = new ConfigReader();
-        System.out.println(this.getClass().getClassLoader().getResource("server-config.xml"));
         configReader.loadConfig(this.getClass().getClassLoader().getResource("server-config.xml").getPath());
         this.jedisPool = new JedisPool(ConfigData.redisHost, ConfigData.redisPort);
         this.baseExcutorService = Executors.newCachedThreadPool();
@@ -42,7 +45,7 @@ public class ActServer {
         try {
             server.run();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

@@ -11,6 +11,8 @@ public class ConfigData {
     public static int serverPort;
     public static String apiUrl;
 
+    public static String DATABASE_URL;
+
     public static final String LOST_CHANNEL_INVALID_CMD = "Lost Channel, Invalid Cmd!";
     public static final String LOST_CHANNEL_NOT_LOGIN = "Lost Channel, Not Login";
     public static final String LOST_CHANNEL_INVALID_TOKEN = "Lost Channel, Invalid Token";

@@ -3,4 +3,5 @@
     <server port="9503"/>
     <redis host="183.136.128.212" port="11211"/>
     <api url="http://test.api.eaglive.com/api/"/>
+    <databaseUrl>url</databaseUrl>
 </config>

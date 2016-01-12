@@ -29,6 +29,9 @@ public class ConfigReader {
             Element apiElement = root.element("api");
             ConfigData.apiUrl = apiElement.attributeValue("url");
 
+            Element dataBaseElement = root.element("databaseUrl");
+            ConfigData.DATABASE_URL = dataBaseElement.getStringValue();
+
             ConfigData.setLastMsgId(BaseUtil.lastMsgId());
 
         } catch (DocumentException e) {
