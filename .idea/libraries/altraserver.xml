@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="altraserver">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/altraserver.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
