@@ -1,0 +1,20 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="actserver:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/actserver_jar</output-path>
+    <root id="archive" name="actserver.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/resources/main/java/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="actserver" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/squareup/okio/okio/1.6.0/okio-1.6.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/netty/netty-all/4.0.33.Final/netty-all-4.0.33.Final.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.4/gson-2.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-pool2/2.3/commons-pool2-2.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/squareup/okhttp/okhttp/2.6.0/okhttp-2.6.0.jar" path-in-jar="/" />
+      <element id="library" level="project" name="altraserver" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/redis/clients/jedis/2.7.3/jedis-2.7.3.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
