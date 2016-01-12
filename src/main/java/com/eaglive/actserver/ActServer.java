@@ -44,6 +44,7 @@ public class ActServer {
             e.printStackTrace();
         }
 		System.out.println("main");
+        System.out.println("f");
 
     }
 
