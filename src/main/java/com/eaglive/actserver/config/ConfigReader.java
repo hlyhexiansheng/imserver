@@ -30,7 +30,7 @@ public class ConfigReader {
             ConfigData.apiUrl = apiElement.attributeValue("url");
 
             Element dataBaseElement = root.element("databaseUrl");
-            ConfigData.DATABASE_URL = dataBaseElement.getStringValue();
+            ConfigData.DATABASE_URL = dataBaseElement.attributeValue("url");
 
             ConfigData.setLastMsgId(BaseUtil.lastMsgId());
 

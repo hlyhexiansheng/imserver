@@ -3,5 +3,5 @@
     <server port="9503"/>
     <redis host="183.136.128.212" port="11211"/>
     <api url="http://test.api.eaglive.com/api/"/>
-    <databaseUrl>url</databaseUrl>
+    <databaseUrl url="jdbc:mysql://183.136.128.212/" database="">jdbc:mysql://183.136.128.212/eaglive?user=stat&password=ecc64a5ced068929&useUnicode=true&characterEncoding=utf8</databaseUrl>
 </config>

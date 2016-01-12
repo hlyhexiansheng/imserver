@@ -538,8 +538,9 @@ public class DBManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-        ds.setJdbcUrl(ConfigData.DATABASE_URL);
-        ds.setInitialPoolSize(2);
+        ds.setJdbcUrl("jdbc:mysql://183.136.128.212/eaglive?user=stat&password=ecc64a5ced068929&useUnicode=true&characterEncoding=utf8");
+//		ds.setJdbcUrl("jdbc:mysql://127.0.0.1/tshirt?user=root&password=123456&useUnicode=true&characterEncoding=utf8");
+		ds.setInitialPoolSize(2);
         ds.setMinPoolSize(10);
         ds.setMaxPoolSize(60);
         ds.setMaxStatements(100);
