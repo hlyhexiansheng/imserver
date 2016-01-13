@@ -8,10 +8,15 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ConfigData {
     public static String redisHost;
     public static int redisPort;
+    public static int redisMaxIdle;
+    public static int redisMaxWaitMills;
     public static int serverPort;
     public static String apiUrl;
 
-    public static String DATABASE_URL;
+    public static String DB_IP;
+    public static String DB_DATABASE_NAME;
+    public static String DB_USERNAME;
+    public static String DB_PASSWORD;
 
     public static final String LOST_CHANNEL_INVALID_CMD = "Lost Channel, Invalid Cmd!";
     public static final String LOST_CHANNEL_NOT_LOGIN = "Lost Channel, Not Login";

@@ -1,15 +1,15 @@
 package com.eaglive.actserver.db;
 
+import com.eaglive.actserver.config.ConfigData;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-
-import com.eaglive.actserver.config.ConfigData;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DBManager {
 
@@ -538,7 +538,7 @@ public class DBManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-        ds.setJdbcUrl("jdbc:mysql://183.136.128.212/eaglive?user=stat&password=ecc64a5ced068929&useUnicode=true&characterEncoding=utf8");
+        ds.setJdbcUrl("jdbc:mysql://" + ConfigData.DB_IP + "/"+ ConfigData.DB_DATABASE_NAME + "?user=" + ConfigData.DB_USERNAME + "&password=" + ConfigData.DB_PASSWORD + "&useUnicode=true&characterEncoding=utf8");
 //		ds.setJdbcUrl("jdbc:mysql://127.0.0.1/tshirt?user=root&password=123456&useUnicode=true&characterEncoding=utf8");
 		ds.setInitialPoolSize(2);
         ds.setMinPoolSize(10);

@@ -2,7 +2,6 @@ package com.eaglive.actserver;
 
 import com.eaglive.actserver.config.ConfigData;
 import com.eaglive.actserver.config.ConfigReader;
-import com.eaglive.actserver.db.DBManager;
 import com.eaglive.actserver.monitor.ExternalMonitor;
 import com.eaglive.actserver.task.ScanActivityTask;
 import com.eaglive.actserver.task.ScanTsTask;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-import java.sql.Connection;
 import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,19 +39,14 @@ public class ActServer {
         this.baseExcutorService = Executors.newCachedThreadPool();
     }
     public static void main(String []args) {
-//        server.init();
-//        server.startMonitor();
-//        server.startTask();
-//        try {
-//            server.run();
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//        }
-
-        DBManager.instance();
-        Connection connection = DBManager.instance().getConnection();
-        System.out.println(connection);
-
+        server.init();
+        server.startMonitor();
+        server.startTask();
+        try {
+            server.run();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
     }
 
     public void startMonitor() {
