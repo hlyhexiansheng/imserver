@@ -1,6 +1,7 @@
 package com.eaglive.actserver.redis;
 
 import com.eaglive.actserver.config.ConfigData;
+import com.eaglive.actserver.config.ConfigReader;
 import com.google.gson.Gson;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
@@ -17,6 +18,28 @@ public class RedisExecManager {
     private Pool<Jedis> pool;
 
     private Gson gson = new Gson();
+
+
+    /**
+     * 包装执行jedis过程，再也不用担心jedis忘记释放的问题了.
+     * @param callBack
+     * @param <T>
+     * @return 回调的返回值业务自己转
+     */
+    public <T> T execute(JedisExecCallBack<T> callBack){
+        Jedis jedis = null;
+        T value = null;
+        try {
+            jedis = this.getJedis();
+            value = callBack.execute(jedis);
+        }catch (Exception e){
+            LOGGER.error("execute JeidsCall error.." + e.getMessage());
+        } finally {
+            jedis.close();
+        }
+        return value;
+    }
+
 
     public <T> T getInfoByKey(String key ,Class<T> tClass){
         Jedis jedis = null;
@@ -129,7 +152,7 @@ public class RedisExecManager {
     private <T> T fromJson(String jsonStr,Class<T> tClass){
         T t = null;
         try {
-            t =  gson.fromJson(jsonStr,tClass);
+            t =  gson.fromJson(jsonStr, tClass);
         }catch (Exception ex){
             LOGGER.error("GSON convert error --> " + jsonStr + " convert to "+ tClass);
         }
@@ -157,6 +180,7 @@ public class RedisExecManager {
         return this.pool.getResource();
     }
 
+
     private static final RedisExecManager _instance = new RedisExecManager();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisExecManager.class);
@@ -165,4 +189,35 @@ public class RedisExecManager {
         return _instance;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //******test
+    public static void main(String[] ags){
+        ConfigReader configReader = new ConfigReader();
+        configReader.loadConfig(RedisExecManager.class.getClassLoader().getResource("server-config.xml").getPath());
+
+        final String key = "helo";
+        JedisExecCallBack<String> callBack = new JedisExecCallBack<String>() {
+            public String execute(Jedis jedis) {
+                return jedis.get(key);
+            }
+        };
+        Object re2 = RedisExecManager.instance().execute(callBack);
+    }
+
 }
+
