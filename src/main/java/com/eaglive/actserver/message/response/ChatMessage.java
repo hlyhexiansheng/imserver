@@ -12,7 +12,8 @@ public class ChatMessage extends ResponseMessage {
     public String headPhoto;
     public String channel;
     public String nickname;
-    public String time;
+    public String userHash;
+    public long time;
     public String readtime;
 
     public ChatMessage() {

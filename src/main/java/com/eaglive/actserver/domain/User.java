@@ -130,7 +130,9 @@ public class User {
         this.headPhoto = weixinInfo.get("headimgurl").getAsString();
     }
     private void getTouristUserInfo() {
-        this.nickName = "游客";
-        this.headPhoto = ConfigData.apiUrl + "images/default_head_photo.png";
+        String key = "touristinfo:" + userHash;
+        JsonObject touristInfo = getRedisValue(key);
+        this.nickName = touristInfo.get("nickname").getAsString();
+        this.headPhoto = touristInfo.get("headimgurl").getAsString();
     }
 }

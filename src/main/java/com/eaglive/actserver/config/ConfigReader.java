@@ -5,6 +5,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import java.io.File;
 
@@ -30,6 +31,10 @@ public class ConfigReader {
 
             Element apiElement = root.element("api");
             ConfigData.apiUrl = apiElement.attributeValue("url");
+
+            Element badElement = root.element("bad");
+            ConfigData.badwordFileName = badElement.attributeValue("filename");
+
 
             Element dataBaseElement = root.element("databaseUrl");
             ConfigData.DB_IP = dataBaseElement.attributeValue("ip");

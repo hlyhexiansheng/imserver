@@ -1,43 +1,44 @@
 package com.eaglive.actserver.lib;
 
+import com.eaglive.actserver.config.ConfigData;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.squareup.okhttp.*;
+import org.dom4j.io.STAXEventReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * Created by admin on 2015/11/27.
  */
 public class HttpClient {
+    private final static Logger logger = LoggerFactory.getLogger(HttpClient.class);
     private final OkHttpClient okHttpClient = new OkHttpClient();
 
     private Map<String, String> params = new HashMap<String, String>();
     private final String url;
-    private Request request;
     private JsonObject result;
-
+    private String bodyString;
     public HttpClient(String url) {
         this.url = url;
         this.result = null;
     }
 
-    public void GET() {
+    public HttpClient() {
+        this(ConfigData.apiUrl);
+    }
+    public HttpClient GET() {
         String fullUrl = getFullUrl();
-        this.request = new Request.Builder().url(fullUrl).build();
-        try {
-            Response response = okHttpClient.newCall(request).execute();
-            JsonParser parser = new JsonParser();
-            this.result = (JsonObject) parser.parse(response.body().string());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Request request = new Request.Builder().url(fullUrl).build();
+        execute(request);
+        return this;
     }
 
     public boolean isSuccess() {
@@ -61,13 +62,38 @@ public class HttpClient {
         return data;
     }
 
-    public void POST() {
-
+    public HttpClient setBody(String body) {
+        this.bodyString = body;
+        return this;
     }
 
+    public HttpClient POST() {
+        String fullUrl = getFullUrl();
+        System.out.println(fullUrl);
+        MediaType mediaType = MediaType.parse("text/json; charset=utf-8");
+        RequestBody body = RequestBody.create(mediaType, bodyString);
+        Request request = new Request.Builder().url(fullUrl).post(body).build();
+        execute(request);
+        return this;
+    }
+
+    private void execute(Request request) {
+        try {
+            Response response = okHttpClient.newCall(request).execute();
+            JsonParser parser = new JsonParser();
+            System.out.println(response.body().string());
+            this.result = (JsonObject) parser.parse(response.body().string());
+        } catch (Exception e) {
+            //logger.error(e.getMessage());
+        }
+    }
     public HttpClient addQueryParam(String key, String value) {
         this.params.put(key, value);
         return this;
+    }
+
+    public HttpClient setCmd(String cmd) {
+        return addQueryParam("cmd", cmd);
     }
 
     public String getFullUrl() {

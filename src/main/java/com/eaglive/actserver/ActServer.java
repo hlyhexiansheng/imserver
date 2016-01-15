@@ -2,9 +2,11 @@ package com.eaglive.actserver;
 
 import com.eaglive.actserver.config.ConfigData;
 import com.eaglive.actserver.config.ConfigReader;
+import com.eaglive.actserver.db.DBManager;
 import com.eaglive.actserver.monitor.ExternalMonitor;
 import com.eaglive.actserver.task.ScanActivityTask;
 import com.eaglive.actserver.task.ScanTsTask;
+import com.eaglive.actserver.util.Badword;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.sql.Connection;
 import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,19 +37,29 @@ public class ActServer {
     private Timer timer;
     public void init() {
         ConfigReader configReader = new ConfigReader();
-        configReader.loadConfig(this.getClass().getClassLoader().getResource("server-config.xml").getPath());
+        System.out.println(this.getClass().getClassLoader().getResource("server-config.xml").getPath());
+        configReader.loadConfig("server-config.xml");
+        Badword.instance.init();
         this.jedisPool = new JedisPool(ConfigData.redisHost, ConfigData.redisPort);
         this.baseExcutorService = Executors.newCachedThreadPool();
     }
     public static void main(String []args) {
+
         server.init();
         server.startMonitor();
         server.startTask();
         try {
+            logger.info("baby , i am coming");
             server.run();
+
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
+
+        DBManager.instance();
+        Connection connection = DBManager.instance().getConnection();
+        System.out.println(connection);
+
     }
 
     public void startMonitor() {
@@ -77,5 +90,9 @@ public class ActServer {
     public synchronized Jedis getJedis() {
         Jedis jedis = new Jedis(ConfigData.redisHost, ConfigData.redisPort);
         return jedis;
+    }
+
+    public void submitTask(Runnable task) {
+        this.baseExcutorService.submit(task);
     }
 }

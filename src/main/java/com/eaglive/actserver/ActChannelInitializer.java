@@ -21,6 +21,6 @@ public class ActChannelInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new HttpRequestDecoder());
         pipeline.addLast(new HttpResponseEncoder());
         pipeline.addLast(new WebSocketHandler());
-        pipeline.addLast(this.systemHandler);
+        pipeline.addLast(new SystemHandler());
     }
 }

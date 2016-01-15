@@ -12,6 +12,7 @@ public class ConfigData {
     public static int redisMaxWaitMills;
     public static int serverPort;
     public static String apiUrl;
+    public static String badwordFileName;
 
     public static String DB_IP;
     public static String DB_DATABASE_NAME;

@@ -13,9 +13,9 @@ public class BaseUtil {
     }
 
     public static long lastMsgId() {
-        HttpClient client = new HttpClient(ConfigData.apiUrl);
-        client.addQueryParam("cmd", "getlastmsgid");
-        client.GET();
+        HttpClient client = new HttpClient(ConfigData.apiUrl)
+                .addQueryParam("cmd", "getlastmsgid")
+                .GET();
         if (client.isSuccess()) {
             JsonObject data = client.getData();
             return data.get("msg_id").getAsLong();

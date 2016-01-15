@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <server port="9503"/>
+    <redis host="183.136.128.212" port="11211" maxIdle="10" maxWaitMillis="1000"/>
+    <api url="http://test.api.eaglive.com/api/"/>
+    <bad filename="badword.txt"/>
+    <databaseUrl ip="183.136.128.212" database="eaglive" user="stat" password="ecc64a5ced068929"></databaseUrl>
+</config>

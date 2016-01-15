@@ -1,6 +1,7 @@
 package com.eaglive.actserver.task;
 
 import com.eaglive.actserver.config.ConfigData;
+import com.eaglive.actserver.lib.HttpClient;
 import com.eaglive.actserver.message.response.ChatMessage;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -12,20 +13,16 @@ import com.squareup.okhttp.*;
 public class WriteCommentTask implements Runnable {
 
     private final ChatMessage chatMessage;
-    private final OkHttpClient httpClient = new OkHttpClient();
     public WriteCommentTask(ChatMessage chatMessage) {
         this.chatMessage = chatMessage;
     }
     public void run() {
         try {
             String bodyString = parseToJson();
-
-            String url = ConfigData.apiUrl + "?cmd=phoneaddcomment";
-            MediaType mediaType = MediaType.parse("text/json; charset=utf-8");
-            RequestBody body = RequestBody.create(mediaType, bodyString);
-            Request request = new Request.Builder().url(url).post(body).build();
-            Response response = httpClient.newCall(request).execute();
-            System.out.println(response.body().string());
+            HttpClient httpClient = new HttpClient()
+                    .setCmd("phoneaddcomment")
+                    .setBody(bodyString);
+            httpClient.POST();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,6 +35,7 @@ public class WriteCommentTask implements Runnable {
         jsonObject.addProperty("channelhash", this.chatMessage.channel);
         jsonObject.addProperty("nick_name", this.chatMessage.nickname);
         jsonObject.addProperty("head_photo", this.chatMessage.headPhoto);
+        jsonObject.addProperty("userhash", this.chatMessage.userHash);
 
         JsonArray array = new JsonArray();
         array.add(jsonObject);

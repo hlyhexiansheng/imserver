@@ -40,6 +40,7 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter {
         }
 
         String wsHost = "ws://"+request.headers().get(HttpHeaders.Names.HOST);
+        System.out.println(wsHost);
         WebSocketServerHandshakerFactory factory = new WebSocketServerHandshakerFactory(
                 wsHost, null, false);
         WebSocketServerHandshaker handshaker = factory.newHandshaker(request);
