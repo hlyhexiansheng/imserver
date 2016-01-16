@@ -2,8 +2,8 @@ package com.eaglive.actserver.domain;
 
 import com.eaglive.actserver.ActServer;
 import com.eaglive.actserver.config.ConfigData;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.eaglive.actserver.lib.JsonInfo;
+import com.eaglive.actserver.redis.RedisExecManager;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -81,25 +81,19 @@ public class User {
 
     private boolean isMember() {
         String key = "usertoken:" + this.userHash;
-        JsonObject object = getRedisValue(key);
+        JsonInfo memberInfo = getRedisValue(key);
 
-        if(object.get("state").getAsInt() == 0) {
+        if(memberInfo.getInt("state") == 0) {
             return false;
         }
         return true;
     }
 
-    private JsonObject getRedisValue(String key) {
-        Jedis jedis = ActServer.server.getJedis();
-        String value = jedis.get(key);
-        jedis.close();
-        JsonParser parser = new JsonParser();
-        JsonObject object = (JsonObject) parser.parse(value);
-        return object;
+    private JsonInfo getRedisValue(String key) {
+        return RedisExecManager.instance().getJsonInfo(key);
     }
 
     private boolean hasRedisKey(String key) {
-
         Jedis jedis = ActServer.server.getJedis();
         try {
             return jedis.exists(key);
@@ -115,24 +109,30 @@ public class User {
 
     private void getMemberUserInfo() {
         String key = "userdata:"  + userHash;
-        JsonObject object = getRedisValue(key);
-        JsonObject userinfoObject = (JsonObject) object.get("userinfo");
-        String headPhotoName = userinfoObject.get("headPhoto").getAsString();
-        this.headPhoto = parseHeadPhoto(headPhotoName);
-        this.nickName = userinfoObject.get("nickname").getAsString();
+        JsonInfo userData = getRedisValue(key);
+        JsonInfo userinfo = userData.getJsonInfo("userinfo");
+        if(userinfo != null) {
+            String headPhotoName = userinfo.getString("headPhoto");
+            this.headPhoto = parseHeadPhoto(headPhotoName);
+            this.nickName = userinfo.getString("nickname");
+        }
     }
 
     private void getWeixinUserInfo() {
         String key = "wxtouristinfo:" + userHash;
-        JsonObject weixinInfo = getRedisValue(key);
+        JsonInfo weixinInfo = getRedisValue(key);
 
-        this.nickName =  weixinInfo.get("nickname").getAsString();
-        this.headPhoto = weixinInfo.get("headimgurl").getAsString();
+        if(weixinInfo != null) {
+            this.nickName =  weixinInfo.getString("nickname");
+            this.headPhoto = weixinInfo.getString("headimgurl");
+        }
     }
     private void getTouristUserInfo() {
         String key = "touristinfo:" + userHash;
-        JsonObject touristInfo = getRedisValue(key);
-        this.nickName = touristInfo.get("nickname").getAsString();
-        this.headPhoto = touristInfo.get("headimgurl").getAsString();
+        JsonInfo touristInfo = getRedisValue(key);
+        if(touristInfo != null) {
+            this.nickName = touristInfo.getString("nickname");
+            this.headPhoto = touristInfo.getString("headimgurl");
+        }
     }
 }

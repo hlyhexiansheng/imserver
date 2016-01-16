@@ -1,11 +1,7 @@
 package com.eaglive.actserver.task;
 
-import com.eaglive.actserver.config.ConfigData;
-import com.eaglive.actserver.lib.HttpClient;
+import com.eaglive.actserver.db.DBManager;
 import com.eaglive.actserver.message.response.ChatMessage;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.squareup.okhttp.*;
 
 /**
  * Created by admin on 2015/12/1.
@@ -17,28 +13,10 @@ public class WriteCommentTask implements Runnable {
         this.chatMessage = chatMessage;
     }
     public void run() {
-        try {
-            String bodyString = parseToJson();
-            HttpClient httpClient = new HttpClient()
-                    .setCmd("phoneaddcomment")
-                    .setBody(bodyString);
-            httpClient.POST();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String sql = "insert into channel_comment(msg_id,comment,channelhash,nick_name,head_photo,userhash,addtime) values(?,?,?,?,?,?,?)";
+        Object []params = new Object[]{chatMessage.msgId, chatMessage.data, chatMessage.channel, chatMessage.nickname,
+        chatMessage.headPhoto,chatMessage.userHash,chatMessage.readtime};
+        DBManager.instance().executeCommand(sql, params);
     }
-    private String parseToJson() {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("msg_id", this.chatMessage.msgId);
-        jsonObject.addProperty("comment", this.chatMessage.data);
-        jsonObject.addProperty("channelhash", this.chatMessage.channel);
-        jsonObject.addProperty("nick_name", this.chatMessage.nickname);
-        jsonObject.addProperty("head_photo", this.chatMessage.headPhoto);
-        jsonObject.addProperty("userhash", this.chatMessage.userHash);
 
-        JsonArray array = new JsonArray();
-        array.add(jsonObject);
-        return array.toString();
-    }
 }

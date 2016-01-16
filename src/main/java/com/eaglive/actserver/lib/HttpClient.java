@@ -1,18 +1,15 @@
 package com.eaglive.actserver.lib;
 
 import com.eaglive.actserver.config.ConfigData;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.squareup.okhttp.*;
-import org.dom4j.io.STAXEventReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -61,7 +58,16 @@ public class HttpClient {
         }
         return data;
     }
+    public List<String> getDataArray() {
+        JsonArray array = (JsonArray) this.result.get("data");
 
+        List<String> result = new ArrayList<String>();
+        for(int i = 0; i < array.size(); ++i) {
+            String activity = array.get(i).getAsString();
+            result.add(activity);
+        }
+        return result;
+    }
     public HttpClient setBody(String body) {
         this.bodyString = body;
         return this;
@@ -81,9 +87,10 @@ public class HttpClient {
         try {
             Response response = okHttpClient.newCall(request).execute();
             JsonParser parser = new JsonParser();
-            System.out.println(response.body().string());
-            this.result = (JsonObject) parser.parse(response.body().string());
+            String text = response.body().string();
+            this.result = (JsonObject) parser.parse(text);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             //logger.error(e.getMessage());
         }
     }

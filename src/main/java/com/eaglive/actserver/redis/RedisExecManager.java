@@ -1,8 +1,10 @@
 package com.eaglive.actserver.redis;
 
 import com.eaglive.actserver.config.ConfigData;
-import com.eaglive.actserver.config.ConfigReader;
+import com.eaglive.actserver.lib.JsonInfo;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,9 @@ public class RedisExecManager {
 
     private Gson gson = new Gson();
 
+    private RedisExecManager() {
+        this.pool = new JedisPool(ConfigData.redisHost, ConfigData.redisPort);
+    }
 
     /**
      * 包装执行jedis过程，再也不用担心jedis忘记释放的问题了.
@@ -63,6 +68,19 @@ public class RedisExecManager {
             jedis.close();
         }
         return value;
+    }
+
+    public JsonInfo getJsonInfo(String key) {
+        Jedis jedis = null;
+        JsonInfo jsonInfo = null;
+        try {
+            jedis = this.getJedis();
+            String value = jedis.get(key);
+            jsonInfo = fromJson(value);
+        }finally {
+            jedis.close();
+        }
+        return jsonInfo;
     }
 
     /**
@@ -169,6 +187,11 @@ public class RedisExecManager {
         return jsonStr;
     }
 
+    private JsonInfo fromJson(String json) {
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(json);
+        return new JsonInfo(element);
+    }
     public void init(){
         GenericObjectPoolConfig config = new GenericObjectPoolConfig();
         config.setMaxIdle(ConfigData.redisMaxIdle);
@@ -176,48 +199,28 @@ public class RedisExecManager {
         this.pool = new JedisPool(config, ConfigData.redisHost,ConfigData.redisPort);
     }
 
+    public boolean sContain(String key, String value) {
+        Jedis jedis = null;
+        boolean isMember = false;
+        try {
+            jedis = this.getJedis();
+            isMember = jedis.sismember(key, value);
+        }finally {
+            jedis.close();
+        }
+        return isMember;
+    }
     public Jedis getJedis(){
         return this.pool.getResource();
     }
 
+    public static RedisExecManager instance() {
+        return _instance;
+    }
 
     private static final RedisExecManager _instance = new RedisExecManager();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisExecManager.class);
-
-    private static final RedisExecManager instance(){
-        return _instance;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //******test
-    public static void main(String[] ags){
-        ConfigReader configReader = new ConfigReader();
-        configReader.loadConfig(RedisExecManager.class.getClassLoader().getResource("server-config.xml").getPath());
-
-        final String key = "helo";
-        JedisExecCallBack<String> callBack = new JedisExecCallBack<String>() {
-            public String execute(Jedis jedis) {
-                return jedis.get(key);
-            }
-        };
-        Object re2 = RedisExecManager.instance().execute(callBack);
-    }
 
 }
 

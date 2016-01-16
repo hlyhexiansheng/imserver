@@ -1,14 +1,15 @@
 package com.eaglive.actserver.handler;
 
-import com.eaglive.actserver.ActServer;
 import com.eaglive.actserver.config.ConfigData;
 import com.eaglive.actserver.domain.Activity;
 import com.eaglive.actserver.domain.User;
 import com.eaglive.actserver.manager.ActivityManager;
 import com.eaglive.actserver.manager.UserManager;
 import com.eaglive.actserver.message.response.ChatMessage;
+import com.eaglive.actserver.redis.RedisExecManager;
 import com.eaglive.actserver.task.WriteCommentTask;
 import com.eaglive.actserver.util.Badword;
+import com.eaglive.actserver.util.BaseUtil;
 import com.eaglive.actserver.util.ServerWriter;
 
 import java.text.SimpleDateFormat;
@@ -24,16 +25,24 @@ public class ChatHandler extends BaseHandler {
         User user = UserManager.instance.getUser(this.channel);
         Activity activity = ActivityManager.instance.getUserActivity(user);
 
-        System.out.println("chat" + word);
+        if(activity == null || isClosedChannel(activity.getHash())) {
+            System.out.println("is closed chanel");
+            return;
+        }
         if (activity != null) {
             ChatMessage chatMessage = new ChatMessage();
             chatMessage.msgId = ConfigData.nextMsgId();
             chatMessage.data = Badword.instance.filter(word);
             chatMessage.channel = activity.getHash();
             chatMessage.headPhoto = user.getHeadPhoto();
-            chatMessage.nickname = user.getNickName();
+
+            String filterNickName = user.getNickName();
+            if(filterNickName.length() > 30) {
+                filterNickName = filterNickName.substring(0, 30);
+            }
+            chatMessage.nickname = filterNickName;
             chatMessage.userHash = user.getUserHash();
-            chatMessage.time = System.currentTimeMillis() / 1000;
+            chatMessage.time = BaseUtil.timestamp();
             chatMessage.readtime = getReadTime();
             addComment(chatMessage);
 
@@ -51,5 +60,10 @@ public class ChatHandler extends BaseHandler {
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return formatter.format(currentTime);
+    }
+
+    private boolean isClosedChannel(String hash) {
+        String key = "closed_channel_list";
+        return RedisExecManager.instance().sContain(key, hash);
     }
 }

@@ -2,7 +2,6 @@ package com.eaglive.actserver;
 
 import com.eaglive.actserver.config.ConfigData;
 import com.eaglive.actserver.config.ConfigReader;
-import com.eaglive.actserver.db.DBManager;
 import com.eaglive.actserver.monitor.ExternalMonitor;
 import com.eaglive.actserver.task.ScanActivityTask;
 import com.eaglive.actserver.task.ScanTsTask;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-import java.sql.Connection;
 import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,7 +35,6 @@ public class ActServer {
     private Timer timer;
     public void init() {
         ConfigReader configReader = new ConfigReader();
-        System.out.println(this.getClass().getClassLoader().getResource("server-config.xml").getPath());
         configReader.loadConfig("server-config.xml");
         Badword.instance.init();
         this.jedisPool = new JedisPool(ConfigData.redisHost, ConfigData.redisPort);
@@ -55,15 +52,10 @@ public class ActServer {
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-
-        DBManager.instance();
-        Connection connection = DBManager.instance().getConnection();
-        System.out.println(connection);
-
     }
 
     public void startMonitor() {
-        this.externalMonitor = new ExternalMonitor(jedisPool.getResource());
+        this.externalMonitor = new ExternalMonitor(getJedis());
         this.baseExcutorService.submit(this.externalMonitor);
     }
 
@@ -88,7 +80,9 @@ public class ActServer {
         }
     }
     public synchronized Jedis getJedis() {
+        System.out.println(ConfigData.redisHost + ":" + ConfigData.redisPort);
         Jedis jedis = new Jedis(ConfigData.redisHost, ConfigData.redisPort);
+        System.out.println(jedis);
         return jedis;
     }
 
