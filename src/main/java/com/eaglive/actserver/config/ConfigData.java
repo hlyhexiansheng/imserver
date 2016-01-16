@@ -1,5 +1,7 @@
 package com.eaglive.actserver.config;
 
+import com.eaglive.actserver.db.DBConnectionInfo;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -19,9 +21,16 @@ public class ConfigData {
     public static String DB_USERNAME;
     public static String DB_PASSWORD;
 
+
+    public static DBConnectionInfo eagLiveInfo = new DBConnectionInfo();
+    public static DBConnectionInfo cloudLiveInfo = new DBConnectionInfo();
+
     public static final String LOST_CHANNEL_INVALID_CMD = "Lost Channel, Invalid Cmd!";
     public static final String LOST_CHANNEL_NOT_LOGIN = "Lost Channel, Not Login";
     public static final String LOST_CHANNEL_INVALID_TOKEN = "Lost Channel, Invalid Token";
+
+
+
 
     private static AtomicLong nextMsgId = new AtomicLong();
     public static long nextMsgId() {

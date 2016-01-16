@@ -12,8 +12,8 @@ public class LeaveHandler extends BaseHandler {
     @Override
     protected void run() {
         String hash = this.getStringParam("channel");
-        Activity activity = ActivityManager.instance.getActivityOrCreateNew(hash);
         User user = UserManager.instance.getUser(this.channel);
+        Activity activity = ActivityManager.instance.getActivityOrCreateNew(hash, user);
         ActivityManager.instance.leaveActivity(activity, user);
         System.out.println("User:"+user+" \nhas joined " + activity);
     }

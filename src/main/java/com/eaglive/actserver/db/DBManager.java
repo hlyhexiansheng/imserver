@@ -24,20 +24,18 @@ public class DBManager {
 	
 	private final static int BATCH_MAX_PARAM_LOG_COUNT = 5;
 	
-	private  static DBManager _instance;
-	
+	private static DBManager eagliveInstance = new DBManager(ConfigData.eagLiveInfo);
+	private static DBManager cloudLiveInstance = new DBManager(ConfigData.cloudLiveInfo);
 	private final ComboPooledDataSource pool;
 	
-	public static DBManager instance(){
-		
-		if(_instance == null){
-			_instance = new DBManager();
-		}
-		return _instance;
+	public static DBManager eagLiveDB(){
+		return eagliveInstance;
 	}
-	
-	public DBManager(){
-		pool = createConnectionPool();
+	public static DBManager cloudLiveDB() {
+		return cloudLiveInstance;
+	}
+	public DBManager(DBConnectionInfo connectionInfo){
+		pool = createConnectionPool(connectionInfo);
 	}
 	public Connection getConnection(){
 		try {
@@ -531,15 +529,15 @@ public class DBManager {
 
 	
 	
-    private static ComboPooledDataSource createConnectionPool(){
+    private static ComboPooledDataSource createConnectionPool(DBConnectionInfo connectionInfo){
         ComboPooledDataSource ds = new ComboPooledDataSource();
         try {
         	ds.setDriverClass("com.mysql.jdbc.Driver");	
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-        ds.setJdbcUrl("jdbc:mysql://" + ConfigData.DB_IP + "/"+ ConfigData.DB_DATABASE_NAME + "?user=" + ConfigData.DB_USERNAME + "&password=" + ConfigData.DB_PASSWORD + "&useUnicode=true&characterEncoding=utf8");
-//		ds.setJdbcUrl("jdbc:mysql://127.0.0.1/tshirt?user=root&password=123456&useUnicode=true&characterEncoding=utf8");
+        ds.setJdbcUrl("jdbc:mysql://" + connectionInfo.host + "/"+ connectionInfo.dbName +
+				"?user=" + connectionInfo.user + "&password=" + connectionInfo.password + "&useUnicode=true&characterEncoding=utf8");
 		ds.setInitialPoolSize(2);
         ds.setMinPoolSize(10);
         ds.setMaxPoolSize(60);

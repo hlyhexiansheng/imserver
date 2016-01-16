@@ -18,7 +18,6 @@ public class ScanActivityTask extends TimerTask {
     public void run() {
         try {
             List<String> activities = getActivityList();
-            System.out.println(activities);
             long timestamp = BaseUtil.timestamp();
             for(String activity : activities) {
                 long lastTime = getActivityLiveTime(activity);

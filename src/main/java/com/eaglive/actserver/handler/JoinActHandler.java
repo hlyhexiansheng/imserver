@@ -14,8 +14,9 @@ public class JoinActHandler extends BaseHandler {
     @Override
     protected void run() {
         String hash = this.getStringParam("channel");
-        Activity activity = ActivityManager.instance.getActivityOrCreateNew(hash);
+
         User user = UserManager.instance.getUser(this.channel);
+        Activity activity = ActivityManager.instance.getActivityOrCreateNew(hash, user);
         ActivityManager.instance.joinActivity(activity, user);
 
         JoinMessage joinMessage = new JoinMessage();

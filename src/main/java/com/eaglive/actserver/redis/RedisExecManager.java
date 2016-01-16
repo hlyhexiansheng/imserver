@@ -12,6 +12,9 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.util.Pool;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Administrator on 16-1-13.
  */
@@ -22,7 +25,7 @@ public class RedisExecManager {
     private Gson gson = new Gson();
 
     private RedisExecManager() {
-        this.pool = new JedisPool(ConfigData.redisHost, ConfigData.redisPort);
+        init();
     }
 
     /**
@@ -76,6 +79,7 @@ public class RedisExecManager {
         try {
             jedis = this.getJedis();
             String value = jedis.get(key);
+
             jsonInfo = fromJson(value);
         }finally {
             jedis.close();
@@ -167,6 +171,49 @@ public class RedisExecManager {
         return status;
     }
 
+    public long hAdd(String key, String hashKey) {
+        return hIncrBy(key, hashKey, 1);
+    }
+    public long hIncrBy(String key, String hashKey, long val) {
+        Jedis jedis = null;
+        long result = 0;
+        try {
+            jedis = this.getJedis();
+            result = jedis.hincrBy(key, hashKey, val);
+        }finally {
+            jedis.close();
+        }
+        return result;
+    }
+
+    public long hGet(String key, String hashKey) {
+        return hIncrBy(key, hashKey, 0);
+    }
+
+    public Map<String,String> hGetAll(String key) {
+        Jedis jedis = null;
+        Map<String,String> result = new HashMap<String, String>();
+        try {
+            jedis = this.getJedis();
+            result = jedis.hgetAll(key);
+        }finally {
+            jedis.close();
+        }
+        return result;
+    }
+
+    public boolean hExist(String key, String hashKey) {
+        Jedis jedis = null;
+        boolean exist = false;
+        try {
+            jedis = this.getJedis();
+            exist = jedis.hexists(key, hashKey);
+        }finally {
+            jedis.close();
+        }
+        return exist;
+    }
+
     private <T> T fromJson(String jsonStr,Class<T> tClass){
         T t = null;
         try {
@@ -188,6 +235,9 @@ public class RedisExecManager {
     }
 
     private JsonInfo fromJson(String json) {
+        if(json == null || json.isEmpty()) {
+            return null;
+        }
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(json);
         return new JsonInfo(element);

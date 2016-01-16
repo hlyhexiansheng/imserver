@@ -21,4 +21,10 @@ public abstract class BaseHandler {
     protected String getStringParam(String key) {
         return this.request.get(key).getAsString();
     }
+    protected int getIntParam(String key) {
+        return this.request.get(key).getAsInt();
+    }
+    protected long getLongParam(String key) {
+        return this.request.get(key).getAsLong();
+    }
 }

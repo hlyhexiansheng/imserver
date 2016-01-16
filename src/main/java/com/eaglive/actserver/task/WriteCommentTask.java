@@ -16,7 +16,7 @@ public class WriteCommentTask implements Runnable {
         String sql = "insert into channel_comment(msg_id,comment,channelhash,nick_name,head_photo,userhash,addtime) values(?,?,?,?,?,?,?)";
         Object []params = new Object[]{chatMessage.msgId, chatMessage.data, chatMessage.channel, chatMessage.nickname,
         chatMessage.headPhoto,chatMessage.userHash,chatMessage.readtime};
-        DBManager.instance().executeCommand(sql, params);
+        DBManager.eagLiveDB().executeCommand(sql, params);
     }
 
 }

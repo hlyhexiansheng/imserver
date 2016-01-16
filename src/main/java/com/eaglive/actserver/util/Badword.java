@@ -48,7 +48,7 @@ public class Badword {
         int length = word.length();
         Set<String> keys = new HashSet<String>();
         for(int i = 0; i < length; i++) {
-            for (int j = i+1; j < length; j++) {
+            for (int j = i+1; j < length + 1; j++) {
                 String key = word.substring(i, j);
                 if(badwords.contains(key)) {
                     keys.add(key);

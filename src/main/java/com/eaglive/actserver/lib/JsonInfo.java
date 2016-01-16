@@ -66,7 +66,7 @@ public class JsonInfo {
     }
 
     public JsonInfo getJsonInfo(String key) {
-        return getJsonInfo(key, JsonInfo.empty);
+        return getJsonInfo(key, null);
     }
 
     public JsonInfo getJsonInfo(String key, JsonInfo defaultVal) {

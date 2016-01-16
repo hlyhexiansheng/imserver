@@ -1,11 +1,14 @@
 package com.eaglive.actserver.task;
 
 
-import com.eaglive.actserver.ActServer;
+import com.eaglive.actserver.redis.RedisExecManager;
 import com.eaglive.actserver.util.BaseUtil;
-import redis.clients.jedis.Jedis;
+import com.eaglive.actserver.util.ChannelUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TimerTask;
 
 /**
  * Created by admin on 2015/11/27.
@@ -14,13 +17,12 @@ public class ScanTsTask extends TimerTask {
 
     @Override
     public void run() {
-        //List<String> needCloseChannels = getNeedCloseChannels();
+        List<String> needCloseChannels = getNeedCloseChannels();
+        closeChannels(needCloseChannels);
     }
 
     private List<String> getNeedCloseChannels() {
-        Jedis jedis = ActServer.server.getJedis();
-        Map<String, String> allTs = jedis.hgetAll("channeltslasttime_hash");
-        jedis.close();
+        Map<String, String> allTs = RedisExecManager.instance().hGetAll("channeltslasttime_hash");
 
         List<String> needCloseChannels = new ArrayList<String>();
 
@@ -31,7 +33,7 @@ public class ScanTsTask extends TimerTask {
                 continue;
             }
             String channel = entry.getKey();
-            if(isAssociateTask(channel)) {
+            if(isAssociateActivity(channel)) {
                 continue;
             }
             needCloseChannels.add(channel);
@@ -39,12 +41,17 @@ public class ScanTsTask extends TimerTask {
         return needCloseChannels;
     }
 
-    private boolean isAssociateTask(String channel) {
-        Jedis jedis = ActServer.server.getJedis();
-        try {
-            return jedis.hexists("activity_channel_associate", channel);
-        } finally {
-            jedis.close();
+    private boolean isAssociateActivity(String channel) {
+        return RedisExecManager.instance().hExist("activity_channel_associate", channel);
+    }
+
+    private void closeChannels(List<String> channels) {
+        System.out.println("needclose channels:");
+        System.out.println(channels);
+        for (String channel : channels) {
+            if(ChannelUtil.isChannelLive(channel)) {
+                ChannelUtil.endChannel(channel);
+            }
         }
     }
 }

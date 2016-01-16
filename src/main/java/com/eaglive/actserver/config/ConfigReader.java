@@ -1,11 +1,11 @@
 package com.eaglive.actserver.config;
 
+import com.eaglive.actserver.db.DBConnectionInfo;
 import com.eaglive.actserver.util.BaseUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import java.io.File;
 
@@ -36,16 +36,25 @@ public class ConfigReader {
             ConfigData.badwordFileName = badElement.attributeValue("filename");
 
 
-            Element dataBaseElement = root.element("databaseUrl");
-            ConfigData.DB_IP = dataBaseElement.attributeValue("ip");
-            ConfigData.DB_DATABASE_NAME = dataBaseElement.attributeValue("database");
-            ConfigData.DB_USERNAME = dataBaseElement.attributeValue("user");
-            ConfigData.DB_PASSWORD = dataBaseElement.attributeValue("password");
+            Element eagLiveElement = root.element("eagliveDB");
+            loadDBConnectionInfo(eagLiveElement, ConfigData.eagLiveInfo);
+
+
+            Element cloudLiveElement = root.element("cloudLiveDB");
+            loadDBConnectionInfo(cloudLiveElement, ConfigData.cloudLiveInfo);
 
             ConfigData.setLastMsgId(BaseUtil.lastMsgId());
 
         } catch (DocumentException e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void loadDBConnectionInfo(Element dataBaseElement, DBConnectionInfo connectionInfo) {
+        connectionInfo.host = dataBaseElement.attributeValue("ip");
+        connectionInfo.dbName = dataBaseElement.attributeValue("database");
+        connectionInfo.user = dataBaseElement.attributeValue("user");
+        connectionInfo.password = dataBaseElement.attributeValue("password");
     }
 }

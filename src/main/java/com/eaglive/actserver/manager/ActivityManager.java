@@ -28,11 +28,14 @@ public class ActivityManager {
     public Activity getUserActivity(User user) {
         return this.users.get(user.getUserHash());
     }
-    public Activity getActivityOrCreateNew(String hash) {
+    public Activity getActivityOrCreateNew(String hash, User user) {
         if (activitys.containsKey(hash)) {
+            Activity activity = activitys.get(hash);
+            activity.addUser(user);
             return activitys.get(hash);
         }
         Activity activity = new Activity(hash);
+        activity.setOwnUser(user);
         return activity;
     }
 }
