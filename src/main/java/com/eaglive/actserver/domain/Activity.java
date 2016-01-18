@@ -57,6 +57,13 @@ public class Activity {
         return activiytUsers.contains(user);
     }
 
+    public List<String> users(){
+        List<String> users = new ArrayList<String>();
+        for (User user : this.activiytUsers) {
+            users.add(user.getUserHash());
+        }
+        return users;
+    }
     private void refreshRedis(long val) {
         String userKey = "webim_userLoveNumber";
         String channelKey = "webim_channelLoveNumber";

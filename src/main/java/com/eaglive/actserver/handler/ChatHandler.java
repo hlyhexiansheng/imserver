@@ -20,10 +20,7 @@ public class ChatHandler extends BaseHandler {
     @Override
     protected void run() {
         String word = this.getStringParam("data");
-
-        System.out.println("dfdkfjl");
         User user = UserManager.instance.getUser(this.channel);
-        System.out.println("after getuser");
         Activity activity = ActivityManager.instance.getUserActivity(user);
 
         System.out.println(user);

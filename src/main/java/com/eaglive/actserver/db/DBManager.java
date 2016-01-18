@@ -86,14 +86,10 @@ public class DBManager {
     }
 
     public boolean isRecordExist(String cmd, Object[] params){
-        boolean result;
-        Connection conn;
-        PreparedStatement stmt;
-        ResultSet rs;
-        result = false;
-        conn = null;
-        stmt = null;
-        rs = null;
+        boolean result = false;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         try{
             conn = this.getConnection();
             stmt = prepareStatement(conn, cmd, params);
@@ -213,14 +209,11 @@ public class DBManager {
     
     
 	public <T> ArrayList<T> executeQuery_ObjectList(String cmd, Object params[], ResultObjectBuilder<T> builder){
-        Connection conn;
-        PreparedStatement stmt;
-        ResultSet rs;
-        ArrayList<T> objectList;
-        conn = null;
-        stmt = null;
-        rs = null;
-        objectList = null;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ArrayList<T> objectList = null;
+
         try{
             conn = this.getConnection();
             stmt = prepareStatement(conn, cmd, params);
@@ -527,8 +520,6 @@ public class DBManager {
 		return sb.toString();
 	}
 
-	
-	
     private static ComboPooledDataSource createConnectionPool(DBConnectionInfo connectionInfo){
         ComboPooledDataSource ds = new ComboPooledDataSource();
         try {

@@ -1,14 +1,16 @@
 package com.eaglive.actserver.monitor;
 
 import com.eaglive.actserver.config.ConfigData;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.eaglive.actserver.db.DBManager;
+import com.eaglive.actserver.lib.HttpClient;
+import com.eaglive.actserver.lib.JsonInfo;
+import com.eaglive.actserver.manager.UserManager;
+import com.eaglive.actserver.message.response.NotificationMessage;
+import com.eaglive.actserver.util.BaseUtil;
+import com.eaglive.actserver.util.ServerWriter;
+import io.netty.channel.Channel;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
-
-import java.io.IOException;
 
 /**
  * Created by admin on 2015/11/13.
@@ -16,12 +18,9 @@ import java.io.IOException;
 public class ExternalMonitor extends JedisPubSub implements Runnable{
     private final static String ADD_NOTIFICATION = "addNotification";
     private final static String ADD_PUSH = "addPush";
-    private final static String PUSH_ALIAS_URL = ConfigData.apiUrl + "?cmd=pushaliasmsg";
     private final Jedis jedis;
-    private final OkHttpClient okHttpClient;
     public ExternalMonitor(Jedis jedis) {
         this.jedis = jedis;
-        this.okHttpClient = new OkHttpClient();
     }
 
     public void run() {
@@ -40,18 +39,40 @@ public class ExternalMonitor extends JedisPubSub implements Runnable{
 
     private void handleAddNotification(String message) {
         System.out.println("handleAddNotification:" + message);
+        JsonInfo notification = new JsonInfo(message);
+        String acceptUser = notification.getString("accept_userhash");
+        Channel channel = UserManager.instance.getChannel(acceptUser);
+        NotificationMessage response = parseNotification(notification, acceptUser);
+        if (channel != null) {
+            ServerWriter.write(channel, response);
+        }
     }
-    
+
+    private NotificationMessage parseNotification(JsonInfo notification, String acceptUser) {
+        NotificationMessage response = new NotificationMessage();
+        response.title = notification.getString("title");
+        response.type = notification.getString("type");
+        response.content = notification.getString("content");
+        response.extra = notification.getJsonInfo("extra").toString();
+        response.id = addToDb(response, acceptUser);
+        return response;
+    }
+
+    private long addToDb(NotificationMessage message, String acceptUser) {
+        DBManager dbManager = DBManager.eagLiveDB();
+        java.sql.Connection connection = dbManager.getConnection();
+        String sql = "insert into message_node(type,accept_userhash,title,content,is_see,addtime,extra)" +
+                " values(?,?,?,?,?,?,?)";
+        Object []params = new Object[]{message.type, acceptUser, message.title,
+                message.content, 0, BaseUtil.getReadTime(), message.extra};
+        dbManager.executeCommand(sql, params, connection);
+        return dbManager.getLastInsertId(connection);
+    }
+
     private void handleAddPush(String message) {
         System.out.println("handleAddPush:" + message);
-        System.out.println(PUSH_ALIAS_URL);
-        final Request request = new Request.Builder().url(PUSH_ALIAS_URL).build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
-            public void onFailure(Request request, IOException e) {
-            }
-            public void onResponse(Response response) throws IOException {
-                System.out.println(response.body().string());
-            }
-        });
+        HttpClient httpClient = new HttpClient(ConfigData.apiUrl);
+        httpClient.setCmd("pushaliasmsg");
+        httpClient.GET();
     }
 }

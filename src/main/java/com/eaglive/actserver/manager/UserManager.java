@@ -21,8 +21,13 @@ public class UserManager {
         return this.ctx2User.get(channel);
     }
     public Channel getChannel(User user) {
-        return this.user2Ctx.get(user.getUserHash());
+        return getChannel(user.getUserHash());
     }
+
+    public Channel getChannel(String userHash) {
+        return this.user2Ctx.get(userHash);
+    }
+
     public void loginAndKickLastChannel(User user, Channel channel) {
         Channel lastChannel = this.user2Ctx.get(user.getUserHash());
         if(lastChannel != null) {

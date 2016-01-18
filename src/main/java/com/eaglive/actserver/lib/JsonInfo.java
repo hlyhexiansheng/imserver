@@ -3,6 +3,7 @@ package com.eaglive.actserver.lib;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,6 @@ import java.util.List;
 public class JsonInfo {
     public static Logger logger = LoggerFactory.getLogger(JsonInfo.class);
     private JsonElement element;
-    public static JsonInfo empty = new JsonInfo();
 
     public JsonInfo() {
         this.element = new JsonObject();
@@ -25,6 +25,11 @@ public class JsonInfo {
         this.element = element;
     }
 
+    public JsonInfo(String message) {
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(message);
+        this.element = element;
+    }
 
     public int getInt(String key) {
         return getInt(key, 0);
@@ -47,6 +52,14 @@ public class JsonInfo {
     }
     public String getString(String key) {
         return getString(key, "");
+    }
+
+    @Override
+    public String toString() {
+        if(this.element != null) {
+            return this.element.toString();
+        }
+        return "";
     }
 
     public String getString(String key, String defaultVal) {

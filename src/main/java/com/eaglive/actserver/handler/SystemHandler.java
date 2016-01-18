@@ -30,8 +30,9 @@ public class SystemHandler extends ChannelInboundHandlerAdapter {
         this.cmd2Handlers.put(Command.LEAVE_ROOM, LeaveHandler.class);
         this.cmd2Handlers.put(Command.CHAT_MSG, ChatHandler.class);
         this.cmd2Handlers.put(Command.LOVE, LoveHandler.class);
-        this.cmd2Handlers.put(Command.ONLINE_USER_LIST, UserListHandler.class);
+        this.cmd2Handlers.put(Command.GET_ONLIEN_USER_LIST, UserListHandler.class);
         this.cmd2Handlers.put(Command.CLOSE_CHANNEL, CloseHandler.class);
+        this.cmd2Handlers.put(Command.SEE_NOTIFICATION, SeeNotificationHandler.class);
     }
 
     @Override
