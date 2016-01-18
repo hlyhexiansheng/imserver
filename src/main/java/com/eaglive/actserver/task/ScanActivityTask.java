@@ -1,9 +1,8 @@
 package com.eaglive.actserver.task;
 
-import com.eaglive.actserver.ActServer;
 import com.eaglive.actserver.lib.HttpClient;
+import com.eaglive.actserver.redis.RedisExecManager;
 import com.eaglive.actserver.util.BaseUtil;
-import redis.clients.jedis.Jedis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +31,12 @@ public class ScanActivityTask extends TimerTask {
     }
 
     private long getActivityLiveTime(String activity) {
-        Jedis jedis = ActServer.server.getJedis();
-        try {
-            String key = "activitylasttime_hash";
-            if(jedis.hexists(key, activity)) {
-                return Long.valueOf(jedis.hget(key, activity));
-            } else {
-                return 0;
-            }
-        } finally {
-            jedis.close();
+        String key = "activitylasttime_hash";
+        RedisExecManager.instance().hExist(key, activity);
+        if(RedisExecManager.instance().hExist(key, activity)) {
+            return RedisExecManager.instance().hGet(key, activity);
+        } else {
+            return 0;
         }
     }
 

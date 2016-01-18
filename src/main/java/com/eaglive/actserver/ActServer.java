@@ -6,6 +6,7 @@ import com.eaglive.actserver.monitor.ExternalMonitor;
 import com.eaglive.actserver.task.ScanActivityTask;
 import com.eaglive.actserver.task.ScanTsTask;
 import com.eaglive.actserver.util.Badword;
+import com.eaglive.actserver.util.SingleServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -14,7 +15,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 import java.util.Timer;
 import java.util.concurrent.ExecutorService;
@@ -29,7 +29,6 @@ public class ActServer {
     private static Logger logger = LoggerFactory.getLogger(ActServer.class);
 
     public static final ActServer server = new ActServer();
-    private JedisPool jedisPool;
     private ExecutorService baseExcutorService;
     private ExternalMonitor externalMonitor;
     private Timer timer;
@@ -37,25 +36,31 @@ public class ActServer {
         ConfigReader configReader = new ConfigReader();
         configReader.loadConfig("server-config.xml");
         Badword.instance.init();
-        this.jedisPool = new JedisPool(ConfigData.redisHost, ConfigData.redisPort);
         this.baseExcutorService = Executors.newCachedThreadPool();
     }
     public static void main(String []args) {
+
+        SingleServer singleServer = new SingleServer();
+        if(!singleServer.trylock()) {
+            logger.error("The server exists!!");
+            return;
+        }
 
         server.init();
         server.startMonitor();
         server.startTask();
         try {
-            logger.info("baby , i am coming");
             server.run();
-
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
+
+        singleServer.unlock();
     }
 
     public void startMonitor() {
-        this.externalMonitor = new ExternalMonitor(getJedis());
+        Jedis jedis = new Jedis(ConfigData.redisHost, ConfigData.redisPort);
+        this.externalMonitor = new ExternalMonitor(jedis);
         this.baseExcutorService.submit(this.externalMonitor);
     }
 
@@ -78,12 +83,6 @@ public class ActServer {
             mainGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
-    }
-    public synchronized Jedis getJedis() {
-        System.out.println(ConfigData.redisHost + ":" + ConfigData.redisPort);
-        Jedis jedis = new Jedis(ConfigData.redisHost, ConfigData.redisPort);
-        System.out.println(jedis);
-        return jedis;
     }
 
     public void submitTask(Runnable task) {

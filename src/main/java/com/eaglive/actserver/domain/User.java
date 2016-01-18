@@ -1,10 +1,8 @@
 package com.eaglive.actserver.domain;
 
-import com.eaglive.actserver.ActServer;
 import com.eaglive.actserver.config.ConfigData;
 import com.eaglive.actserver.lib.JsonInfo;
 import com.eaglive.actserver.redis.RedisExecManager;
-import redis.clients.jedis.Jedis;
 
 /**
  * Created by admin on 2015/11/9.
@@ -24,7 +22,10 @@ public class User {
     private String nickName;
     private String headPhoto;
     public User() {
-
+        userHash = "";
+        token = "";
+        nickName = "";
+        headPhoto = "";
     }
     public User(String userHash, String token) {
         this.userHash = userHash;
@@ -72,6 +73,8 @@ public class User {
         return "User{" +
                 "userHash='" + userHash + '\'' +
                 ", token='" + token + '\'' +
+                ", nickName='" + nickName + '\'' +
+                ", headPhoto='" + headPhoto + '\'' +
                 '}';
     }
 
@@ -94,12 +97,7 @@ public class User {
     }
 
     private boolean hasRedisKey(String key) {
-        Jedis jedis = ActServer.server.getJedis();
-        try {
-            return jedis.exists(key);
-        } finally {
-            jedis.close();
-        }
+        return RedisExecManager.instance().exsit(key);
     }
 
     private boolean isWeixin() {

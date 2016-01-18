@@ -20,9 +20,13 @@ public class ChatHandler extends BaseHandler {
     @Override
     protected void run() {
         String word = this.getStringParam("data");
+
+        System.out.println("dfdkfjl");
         User user = UserManager.instance.getUser(this.channel);
+        System.out.println("after getuser");
         Activity activity = ActivityManager.instance.getUserActivity(user);
 
+        System.out.println(user);
         if(activity == null || isClosedChannel(activity.getHash())) {
             System.out.println("is closed chanel");
             return;
@@ -42,15 +46,16 @@ public class ChatHandler extends BaseHandler {
         chatMessage.userHash = user.getUserHash();
         chatMessage.time = BaseUtil.timestamp();
         chatMessage.readtime = BaseUtil.getReadTime();
-        addComment(chatMessage);
 
         ServerWriter.writeToActivityButHimself(activity, user, chatMessage);
+        addComment(chatMessage);
 
     }
 
     private void addComment(ChatMessage chatMessage) {
         Runnable task = new WriteCommentTask(chatMessage);
         ActServer.server.submitTask(task);
+        //new Thread(task).start();
     }
 
     private boolean isClosedChannel(String hash) {

@@ -256,7 +256,9 @@ public class RedisExecManager {
             jedis = this.getJedis();
             isMember = jedis.sismember(key, value);
         }finally {
-            jedis.close();
+            if(jedis != null) {
+                jedis.close();
+            }
         }
         return isMember;
     }

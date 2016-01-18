@@ -46,8 +46,6 @@ public class ScanTsTask extends TimerTask {
     }
 
     private void closeChannels(List<String> channels) {
-        System.out.println("needclose channels:");
-        System.out.println(channels);
         for (String channel : channels) {
             if(ChannelUtil.isChannelLive(channel)) {
                 ChannelUtil.endChannel(channel);

@@ -55,7 +55,8 @@ public class JsonInfo {
             if(element instanceof JsonObject) {
                 JsonObject jsonObject = (JsonObject) element;
                 JsonElement subElement = jsonObject.get(key);
-                if(subElement != null) {
+                System.out.println(subElement);
+                if(subElement != null && !subElement.isJsonNull()) {
                     value = subElement.getAsString();
                 }
             }
