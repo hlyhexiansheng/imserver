@@ -1,6 +1,7 @@
 package com.eaglive.actserver.handler;
 
 import com.eaglive.actserver.db.DBManager;
+import com.eaglive.actserver.util.BaseUtil;
 
 /**
  * Created by admin on 2016/1/18.
@@ -14,8 +15,8 @@ public class SeeNotificationHandler extends BaseHandler {
     }
 
     private void seeNotification(String userHash, long id) {
-        String sql = "update message_node set seetime=? AND is_see=1 where id=? ADN accept_userhash=?";
-        Object []params = new Object[]{id, userHash};
+        String sql = "update message_node set seetime=?,is_see=1 where id=? AND accept_userhash=?";
+        Object []params = new Object[]{BaseUtil.getReadTime(), id, userHash};
         DBManager.eagLiveDB().executeCommand(sql, params);
     }
 }

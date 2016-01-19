@@ -12,6 +12,8 @@ import io.netty.channel.Channel;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
+import java.sql.SQLException;
+
 /**
  * Created by admin on 2015/11/13.
  */
@@ -42,23 +44,22 @@ public class ExternalMonitor extends JedisPubSub implements Runnable{
         JsonInfo notification = new JsonInfo(message);
         String acceptUser = notification.getString("accept_userhash");
         Channel channel = UserManager.instance.getChannel(acceptUser);
-        NotificationMessage response = parseNotification(notification, acceptUser);
+        NotificationMessage response = addToDb(notification);
         if (channel != null) {
             ServerWriter.write(channel, response);
         }
     }
 
-    private NotificationMessage parseNotification(JsonInfo notification, String acceptUser) {
-        NotificationMessage response = new NotificationMessage();
-        response.title = notification.getString("title");
-        response.type = notification.getString("type");
-        response.content = notification.getString("content");
-        response.extra = notification.getJsonInfo("extra").toString();
-        response.id = addToDb(response, acceptUser);
-        return response;
-    }
+    private NotificationMessage addToDb(JsonInfo notification) {
 
-    private long addToDb(NotificationMessage message, String acceptUser) {
+        NotificationMessage message = new NotificationMessage();
+        message.title = notification.getString("title");
+        message.type = notification.getString("type");
+        message.content = notification.getString("content");
+        message.extra = notification.getJsonInfo("extra").toString();
+
+        String acceptUser = notification.getString("accept_userhash");
+
         DBManager dbManager = DBManager.eagLiveDB();
         java.sql.Connection connection = dbManager.getConnection();
         String sql = "insert into message_node(type,accept_userhash,title,content,is_see,addtime,extra)" +
@@ -66,8 +67,15 @@ public class ExternalMonitor extends JedisPubSub implements Runnable{
         Object []params = new Object[]{message.type, acceptUser, message.title,
                 message.content, 0, BaseUtil.getReadTime(), message.extra};
         dbManager.executeCommand(sql, params, connection);
-        return dbManager.getLastInsertId(connection);
+        message.id =  dbManager.getLastInsertId(connection);
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return message;
     }
+
 
     private void handleAddPush(String message) {
         System.out.println("handleAddPush:" + message);

@@ -14,6 +14,13 @@ public class ChannelUtil {
         return RedisExecManager.instance().getJsonInfo(key);
     }
 
+    public static String getChannelOwner(String channelHash) {
+        JsonInfo channelInfo = getChannelInfo(channelHash);
+        if(channelInfo == null) {
+            return "";
+        }
+        return channelInfo.getString("userhash");
+    }
     public static boolean isChannelLive(String channelHash) {
         JsonInfo channelInfo = getChannelInfo(channelHash);
         if(channelInfo == null) {
@@ -21,6 +28,8 @@ public class ChannelUtil {
         }
         return channelInfo.getInt("state") == 1;
     }
+
+
     public static void endChannel(String channelHash) {
         String key = "channel:" + channelHash;
         RedisExecManager.instance().delete(key);

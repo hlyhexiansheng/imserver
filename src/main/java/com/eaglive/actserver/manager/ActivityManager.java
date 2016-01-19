@@ -10,18 +10,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by admin on 2015/11/12.
  */
 public class ActivityManager {
-    private final Map<String, Activity> activitys = new ConcurrentHashMap<String, Activity>();
+    private final Map<String, Activity> activities = new ConcurrentHashMap<String, Activity>();
     private final Map<String, Activity> users = new ConcurrentHashMap<String, Activity>();
     public static final ActivityManager instance = new ActivityManager();
     public void joinActivity(Activity activity, User user) {
         activity.addUser(user);
-        this.activitys.put(activity.getHash(), activity);
+        this.activities.put(activity.getHash(), activity);
         this.users.put(user.getUserHash(), activity);
     }
 
     public void leaveActivity(Activity activity, User user) {
         activity.removeUser(user);
-        this.activitys.remove(activity.getHash());
+        this.activities.remove(activity.getHash());
         this.users.remove(user.getUserHash());
     }
 
@@ -29,13 +29,13 @@ public class ActivityManager {
         return this.users.get(user.getUserHash());
     }
     public Activity getActivityOrCreateNew(String hash, User user) {
-        if (activitys.containsKey(hash)) {
-            Activity activity = activitys.get(hash);
+        if (activities.containsKey(hash)) {
+            Activity activity = activities.get(hash);
             activity.addUser(user);
-            return activitys.get(hash);
+            return activities.get(hash);
         }
         Activity activity = new Activity(hash);
-        activity.setOwnUser(user);
+        activity.addUser(user);
         return activity;
     }
 }

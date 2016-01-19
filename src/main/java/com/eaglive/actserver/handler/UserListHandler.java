@@ -22,6 +22,6 @@ public class UserListHandler extends BaseHandler {
         UserListMessage message = new UserListMessage();
         message.userlist = users;
         message.channel = activity.getHash();
-        ServerWriter.write(this.channel, message);
+        ServerWriter.write(channel, message);
     }
 }

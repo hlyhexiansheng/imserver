@@ -33,6 +33,25 @@ public class ServerWriter {
         future.addListener(ChannelFutureListener.CLOSE);
     }
 
+    public static void write(User user, ResponseMessage response) {
+        ChannelFuture future = write(UserManager.instance.getChannel(user), response);
+        future.addListener(ChannelFutureListener.CLOSE);
+    }
+
+    public static void writeAllBut(User user, Activity activity, ResponseMessage responseMessage) {
+        List<User> users = activity.getUsers();
+        List<Channel> channels = new ArrayList<Channel>();
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User other = iterator.next();
+            if(user.equals(other)) {
+                continue;
+            }
+            channels.add(UserManager.instance.getChannel(other));
+        }
+        writeToChannels(channels, responseMessage);
+    }
+
     public static void writeToActivity(Activity activity, ResponseMessage response) {
         List<User> users = activity.getUsers();
         List<Channel> channels = new ArrayList<Channel>();

@@ -1,5 +1,6 @@
 package com.eaglive.actserver.handler;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.netty.channel.Channel;
 
@@ -19,12 +20,24 @@ public abstract class BaseHandler {
     protected abstract void run();
 
     protected String getStringParam(String key) {
-        return this.request.get(key).getAsString();
+        JsonElement element = this.request.get(key);
+        if(element != null) {
+            return element.getAsString();
+        }
+        return "";
     }
     protected int getIntParam(String key) {
-        return this.request.get(key).getAsInt();
+        JsonElement element = this.request.get(key);
+        if(element != null) {
+            return element.getAsInt();
+        }
+        return 0;
     }
     protected long getLongParam(String key) {
-        return this.request.get(key).getAsLong();
+        JsonElement element = this.request.get(key);
+        if(element != null) {
+            return element.getAsLong();
+        }
+        return 0;
     }
 }
