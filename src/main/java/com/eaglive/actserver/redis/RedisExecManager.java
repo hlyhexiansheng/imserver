@@ -43,7 +43,7 @@ public class RedisExecManager {
         }catch (Exception e){
             LOGGER.error("execute JeidsCall error.." + e.getMessage());
         } finally {
-            jedis.close();
+            this.close(jedis);
         }
         return value;
     }
@@ -56,7 +56,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             value = jedis.get(key);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return this.fromJson(value,tClass);
     }
@@ -68,7 +68,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             value = jedis.get(key);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return value;
     }
@@ -82,7 +82,7 @@ public class RedisExecManager {
 
             jsonInfo = fromJson(value);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return jsonInfo;
     }
@@ -100,7 +100,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             result = jedis.expireAt(key, unixTime);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return result;
     }
@@ -118,9 +118,17 @@ public class RedisExecManager {
             jedis = this.getJedis();
             result = jedis.expire(key, seconds);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return result;
+    }
+    
+    private void close(Jedis jedis){
+        if(jedis == null){
+            LOGGER.error("jedis is NUll...");
+            return;
+        }
+        jedis.close();
     }
 
     public boolean exsit(String key){
@@ -130,7 +138,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             result = jedis.exists(key);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return result;
     }
@@ -142,7 +150,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             status = jedis.set(key, this.toJson(object));
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return status;
     }
@@ -154,7 +162,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             status = jedis.setex(key, seconds, this.toJson(object));
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return status;
     }
@@ -166,7 +174,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             status = jedis.del(key);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return status;
     }
@@ -181,7 +189,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             result = jedis.hincrBy(key, hashKey, val);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return result;
     }
@@ -197,7 +205,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             result = jedis.hgetAll(key);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return result;
     }
@@ -209,7 +217,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             exist = jedis.hexists(key, hashKey);
         }finally {
-            jedis.close();
+            this.close(jedis);
         }
         return exist;
     }
@@ -256,9 +264,7 @@ public class RedisExecManager {
             jedis = this.getJedis();
             isMember = jedis.sismember(key, value);
         }finally {
-            if(jedis != null) {
-                jedis.close();
-            }
+            this.close(jedis);
         }
         return isMember;
     }
@@ -273,6 +279,20 @@ public class RedisExecManager {
     private static final RedisExecManager _instance = new RedisExecManager();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisExecManager.class);
+
+
+
+    public static void main(String[] args){
+        final String key = "";
+        JedisExecCallBack jedisExecCallBack = new JedisExecCallBack<String>(){
+            public String execute(Jedis jedis) {
+                String value = jedis.get(key);
+                return value;
+            }
+        };
+
+        RedisExecManager.instance().execute(jedisExecCallBack);
+    }
 
 }
 

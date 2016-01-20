@@ -40,6 +40,7 @@ public class ActServer {
     }
     public static void main(String []args) {
 
+        logger.error("The main running!!");
         SingleServer singleServer = new SingleServer();
         if(!singleServer.trylock()) {
             logger.error("The server exists!!");
